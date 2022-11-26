@@ -1,0 +1,183 @@
+<!DOCTYPE html><html class="" lang=""><head><script type="text/javascript" class="silex-json-styles" data-silex-static="">
+    window.silex = window.silex || {}
+    window.silex.data = {"site":{"width":1200},"pages":[{"id":"page-main-page","displayName":"Main Page","link":{"linkType":"LinkTypePage","href":"#!page-main-page"},"canDelete":true,"canProperties":true,"canMove":true,"canRename":true,"opened":false}]}</script>
+    <meta charset="UTF-8">
+    <!-- generator meta tag -->
+    <!-- leave this for stats and Silex version check -->
+    <meta name="generator" content="Silex v2.2.14">
+    <!-- End of generator meta tag -->
+    <script type="text/javascript" src="https://editor.silex.me/static/2.12/jquery.js" data-silex-static=""></script>
+    <script type="text/javascript" src="https://editor.silex.me/static/2.12/jquery-ui.js" data-silex-static="" data-silex-remove-publish=""></script>
+    <script type="text/javascript" src="https://editor.silex.me/static/2.12/pageable.js" data-silex-static="" data-silex-remove-publish=""></script>
+    <script type="text/javascript" src="https://editor.silex.me/static/2.12/front-end.js" data-silex-static=""></script>
+    <link rel="stylesheet" href="https://editor.silex.me/static/2.12/normalize.css" data-silex-static="">
+    <link rel="stylesheet" href="https://editor.silex.me/static/2.12/front-end.css" data-silex-static="">
+
+    <style class="silex-style">:root {--box-width: 49.5%; --box-height: 90%;}textarea {height: var(--box-height); resize: none; display: inline-block; width: var(--box-width);}#container {display: flow-root;}#scriptbox {float: left;}#outbox {height: var(--box-height); width: var(--box-width); float: right; border-style: solid; border-width: 0.5px; overflow-y: scroll; overflow-wrap: anywhere;}#controls {padding-top: 5px;}#clear {float: right;}.text {display: inline-flex; margin: 0.5%;}</style>
+    <script type="text/javascript" class="silex-script"></script>
+    <style class="silex-inline-styles">.body-initial {background-color: rgba(255,255,255,1); position: static;}.silex-id-1478366444112-1 {background-color: transparent; position: static; margin-top: -1px;}.silex-id-1478366444112-0 {background-color: transparent; min-height: 100px; position: relative; margin-left: auto; margin-right: auto;}.silex-id-1474394621033-3 {position: static; margin-top: -1px;}.silex-id-1474394621032-2 {background-color: transparent; min-height: 600px; position: relative; margin-left: auto; margin-right: auto;}.silex-id-1478366450713-3 {background-color: transparent; position: static; margin-top: -1px;}.silex-id-1478366450713-2 {background-color: transparent; min-height: 100px; position: relative; margin-left: auto; margin-right: auto;}.silex-id-1442914737143-3 {width: 241px; top: 26px; left: 494px; min-height: 51px; position: absolute;}@media only screen and (max-width: 480px) {}</style>
+    <title></title>
+    
+
+    
+<style class="silex-prodotype-style" data-style-id="all-style">.text-element > .silex-element-content {font-family: 'Roboto', sans-serif;}</style><link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" class="silex-custom-font"><meta name="viewport" content="width=device-width, initial-scale=1"><style class="silex-style-settings">.website-width {width: 1200px;}@media (min-width: 481px) {.silex-editor {min-width: 1400px;}}</style><!-- Silex HEAD tag do not remove --><!-- https://github.com/Burkino/syn-multiinstance-exec -->
+<html>
+
+<head>
+    <title>Burkino's Multi-piece-of-shit whatever</title>
+    <link type="text/css" rel="stylesheet" href="./style.css">
+    <meta http-equiv="Content-Security-Policy" content="img-src 'none';">
+</head>
+
+<body>
+    <div id="container">
+        <textarea id="scriptbox" spellcheck="false"></textarea>
+
+        <iframe id="outbox"></iframe>
+
+    </div>
+    <div id="controls">
+        <button id="run">Run</button>
+        <select id="select">
+            <option value="all">All clients</option>
+        </select>
+        <button id="clear">Clear</button>
+    </div>
+
+    <script>
+        var scriptbox = document.getElementById('scriptbox');
+        var outbox = document.getElementById('outbox').contentDocument;
+        var run = document.getElementById('run');
+        var select = document.getElementById('select');
+        var clear = document.getElementById('clear');
+
+        var cssLink = document.createElement("link");
+        cssLink.href = "./style.css"; 
+        cssLink.rel = "stylesheet"; 
+        cssLink.type = "text/css"; 
+        outbox.head.appendChild(cssLink);
+
+        var timeout;
+        function connect() {
+            var socket = new WebSocket(`ws://${window.location.host}`);
+            socket.onmessage = function (data) {
+                data = JSON.parse(data.data);
+                switch (data.type) {
+                    case 'updatelog':
+                        var date = new Date();
+                        var elem = outbox.createElement('div');
+                        elem.className = "text";
+
+                        var time = outbox.createElement('div');
+                        time.style = "padding-right: 2px;white-space: nowrap;";
+                        time.textContent = `[${date.toLocaleTimeString()}]`;
+                        elem.appendChild(time);
+
+                        var sender = outbox.createElement('div');
+                        sender.style = "padding-right: 2px;white-space: nowrap;";
+                        sender.textContent = `[${data.sender}]`;
+                        elem.appendChild(sender);
+
+                        var msg = outbox.createElement('div');
+                        msg.textContent = `${data.message}`;
+                        elem.appendChild(msg);
+                        
+                        outbox.body.appendChild(elem);
+                        
+                        var br = outbox.createElement('br');
+                        outbox.body.appendChild(br);
+                        break;
+                    case 'addclient':
+                        var opt = document.createElement('option');
+                        opt.value = data.sender;
+                        opt.innerHTML = `${data.sender} [${data.game}]`;
+                        select.appendChild(opt);
+                        break;
+                    case 'removeclient':
+                        for (var i = 0; i < select.options.length; i++) {
+                            if (select.options[i].value == data.sender) {
+                                select.remove(i);
+                                break;
+                            }
+                        }
+                        break;
+                }
+            };
+
+            socket.onopen = function () {
+                clearTimeout(timeout);
+                socket.send(JSON.stringify({ type: 'init', sender: "MASTER" }));
+            };
+
+            socket.onclose = function () {
+                connect()
+            };
+        }
+
+        connect();
+
+        clear.addEventListener('click', function () {
+            outbox.body.innerHTML = '';
+        });
+
+        run.addEventListener('click', function () {
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    script: scriptbox.value,
+                    receiver: select.value
+                })
+            })
+        })
+    </script>
+
+</body>
+
+</html>
+<!-- End of Silex HEAD tag do not remove --></head>
+
+<body data-silex-id="body-initial" class="body-initial all-style enable-mobile prevent-resizable prevent-selectable editable-style silex-runtime" data-silex-type="container-element" style="">
+    
+
+
+
+
+
+
+
+
+
+    <section data-silex-type="container-element" class="container-element editable-style silex-id-1478366444112-1 section-element prevent-resizable page-page-1 page-main-page paged-element" data-silex-id="silex-id-1478366444112-1">
+        <div data-silex-type="container-element" class="editable-style silex-element-content silex-id-1478366444112-0 container-element website-width" data-silex-id="silex-id-1478366444112-0"></div>
+    </section>
+    <section data-silex-type="container-element" class="container-element editable-style silex-id-1474394621033-3 section-element prevent-resizable page-page-1 page-main-page paged-element" data-silex-id="silex-id-1474394621033-3">
+        <div data-silex-type="container-element" class="editable-style silex-element-content silex-id-1474394621032-2 container-element website-width selected" data-silex-id="silex-id-1474394621032-2"></div>
+    </section>
+    <section data-silex-type="container-element" class="container-element editable-style silex-id-1478366450713-3 section-element prevent-resizable page-page-1 page-main-page paged-element" data-silex-id="silex-id-1478366450713-3">
+        <div data-silex-type="container-element" class="editable-style silex-element-content silex-id-1478366450713-2 container-element website-width" data-silex-id="silex-id-1478366450713-2">
+
+            <div data-silex-id="silex-id-1442914737143-3" class="editable-style silex-id-1442914737143-3 text-element" data-silex-type="text-element">
+                <div class="silex-element-content normal"><p>Powered by <a href="https://www.silex.me/" target="_blank" title="Silex website builder,  free and open source" linktype="LinkTypeExternal">Silex website builder</a></p></div>
+            </div>
+        </div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>
